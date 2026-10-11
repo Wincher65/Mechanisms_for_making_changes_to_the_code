@@ -1,0 +1,38 @@
+def caesar_encrypt(text, shift):
+    encrypted_text = ""
+    for char in text:
+        if char.isalpha():
+            # Проверка для латиницы
+            if "a" <= char <= "z" or "A" <= char <= "Z":
+                ascii_offset = ord("a") if char.islower() else ord("A")
+                alphabet_size = 26
+            # Проверка для кириллицы (исправлен баг с буквой Я)
+            elif "а" <= char <= "я" or "А" <= char <= "Я":
+                ascii_offset = ord("а") if char.islower() else ord("А")
+                alphabet_size = 32
+            else:
+                encrypted_text += char
+                continue
+
+            # Сдвиг буквы с учетом размера алфавита конкретного языка
+            shifted_index = (ord(char) - ascii_offset + shift) % alphabet_size
+            encrypted_char = chr(shifted_index + ascii_offset)
+            encrypted_text += encrypted_char
+        else:
+            encrypted_text += char
+    return encrypted_text
+
+
+def caesar_decrypt(encrypted_text, shift):
+
+    return caesar_encrypt(encrypted_text, -shift)
+
+
+# Пример использования
+text = "Привет, World! Я ем кашу"
+shift = 3
+encrypted = caesar_encrypt(text, shift)
+decrypted = caesar_decrypt(encrypted, shift)
+
+print(f"Зашифровано: {encrypted}")
+print(f"Расшифровано: {decrypted}")
