@@ -1,3 +1,5 @@
+# import os - команда, которая подключает к вашей программе встроенный модуль os 
+import os
 def caesar_encrypt(text, shift):
     encrypted_text = ""
     for char in text:
@@ -6,7 +8,7 @@ def caesar_encrypt(text, shift):
             if "a" <= char <= "z" or "A" <= char <= "Z":
                 ascii_offset = ord("a") if char.islower() else ord("A")
                 alphabet_size = 26
-            # Проверка для кириллицы (исправлен баг с буквой Я)
+            # Проверка для кириллицы
             elif "а" <= char <= "я" or "А" <= char <= "Я":
                 ascii_offset = ord("а") if char.islower() else ord("А")
                 alphabet_size = 32
@@ -14,25 +16,60 @@ def caesar_encrypt(text, shift):
                 encrypted_text += char
                 continue
 
-            # Сдвиг буквы с учетом размера алфавита конкретного языка
             shifted_index = (ord(char) - ascii_offset + shift) % alphabet_size
             encrypted_char = chr(shifted_index + ascii_offset)
             encrypted_text += encrypted_char
         else:
             encrypted_text += char
     return encrypted_text
-
-
+# Функции шифровки / расшифровки
 def caesar_decrypt(encrypted_text, shift):
-
     return caesar_encrypt(encrypted_text, -shift)
 
+# Безопасное получение целого числа от пользователя
+def get_integer_input(prompt):  
+    while True:
+        try:
+            return int(input(prompt))
+        except ValueError:
+            print(" Ошибка - Введите целое число.")
+            
+# Прокачанный интерфейс пользователя 
+def UI():
+    while True:
+        print("-"*40)
+        print(" ШИФР ЦЕЗАРЯ ")
+        print("-"*40)
+        print("1) Зашифровать текст")
+        print("2) Расшифровать текст")
+        print("3) Выйти из программы")
+        print("-"*40)
+        
+        choice = input("Выберите действие (1-3): ").strip()
+        
+        if choice == "3":
+            print("\n Все гайс, пока!")
+            break
+            
+        if choice in ("1", "2"):
+            text = input("\n Введите текст: ")
+            shift = get_integer_input(" Введите величину сдвига : ")
+            
+            if choice == "1":
+                result = caesar_encrypt(text, shift)
+                print(f"\n Зашифрованный текст:\n {result}")
+            else:
+                result = caesar_decrypt(text, shift)
+                print(f"\n Расшифрованный текст:\n {result}")
+                
+            input("\n Все гайс, нажмите Enter, чтобы продолжить. ")
+            # Опциональная очистка экрана
+            os.system('cls' if os.name == 'nt' else 'clear')
+        else:
+            print(" Неа, неверно!")
 
-# Пример использования
-text = "Привет, World! Я ем кашу"
-shift = 3
-encrypted = caesar_encrypt(text, shift)
-decrypted = caesar_decrypt(encrypted, shift)
+def main():
+    UI()
 
-print(f"Зашифровано: {encrypted}")
-print(f"Расшифровано: {decrypted}")
+if __name__ == "__main__":
+    main()
