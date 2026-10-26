@@ -1,0 +1,35 @@
+MAXN = 10
+
+def row_sum(row):
+    #Вернуть сумму элементов строки
+    return sum(row)
+
+def check(mat):
+    """
+    Проверить, что суммы чётных строк строго возрастают.
+
+    Возвращает кортеж, где ok - результат проверки,
+    sums - список сумм чётных строк
+    
+    """
+    sums = [row_sum(mat[i]) for i in range(0, len(mat), 2)]
+    ok = all(sums[k] < sums[k + 1] for k in range(len(sums) - 1))
+    return ok, sums
+
+def read_matrix(name):
+    #Прочитать матрицу с клавиатуры по имени name
+    n, m = map(int, input(f'Размеры {name} (n m): ').split())
+    print(f'Элементы {name}:')
+    return [list(map(int, input().split())) for _ in range(n)]
+
+def main():
+    #Точка входа: ввод двух матриц и вывод результата
+    matrices = {name: read_matrix(name) for name in ('A', 'B')}
+
+    for name, mat in matrices.items():
+        ok, sums = check(mat)
+        status = 'ВЫПОЛНЕНО' if ok else 'НЕ выполнено'
+        print(f'Массив {name}: суммы чётных строк = {sums} -> {status}')
+
+if __name__ == '__main__':
+    main()
