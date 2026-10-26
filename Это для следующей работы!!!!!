@@ -31,5 +31,5 @@ def main():
         status = 'ВЫПОЛНЕНО' if ok else 'НЕ выполнено'
         print(f'Массив {name}: суммы чётных строк = {sums} -> {status}')
 
-if __name__ == '__main__':
+if __name__ == 'main':
     main()
