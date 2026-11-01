@@ -1,35 +1,82 @@
-MAXN = 10
-
 def row_sum(row):
-    #Вернуть сумму элементов строки
-    return sum(row)
+    # Вычисляет сумму элементов строки.
+    s = 0
+    for x in row:
+        s += x
+    return s
 
-def check(mat):
+
+def is_increasing(sums):
+    # Проверяет, что последовательность сумм возрастает.
+    if len(sums) < 2:
+        return True  # одна сумма (или ноль) — тривиально возрастает
+    for i in range(1, len(sums)):
+        if sums[i] <= sums[i - 1]:
+            return False
+    return True
+
+
+def check_array(matrix, name):
+    # Проверяет условие для одного массива и выводит результат.
+    n = len(matrix)
     """
-    Проверить, что суммы чётных строк строго возрастают.
 
-    Возвращает кортеж, где ok - результат проверки,
-    sums - список сумм чётных строк
-    
-    """
-    sums = [row_sum(mat[i]) for i in range(0, len(mat), 2)]
-    ok = all(sums[k] < sums[k + 1] for k in range(len(sums) - 1))
-    return ok, sums
+    Чётные строки: индексы 0, 2, 4, ... (нумерация с 0)
+     (в условии "чётные строки" — берём строки с чётными индексами)
+     
+     """
+    sums = []
+    for i in range(0, n, 2):
+        sums.append(row_sum(matrix[i]))
 
-def read_matrix(name):
-    #Прочитать матрицу с клавиатуры по имени name
-    n, m = map(int, input(f'Размеры {name} (n m): ').split())
-    print(f'Элементы {name}:')
-    return [list(map(int, input().split())) for _ in range(n)]
+    print(f"\nМассив {name}:")
+    print(f"  Суммы чётных строк: {sums}")
+
+    if is_increasing(sums):
+        print(f"  Результат: "  # Выполняется условие
+              f"Cуммы чётных строк образуют возрастающую последовательность")
+    else:
+        print(f"  Результат: "  # Не выполняется условие
+              f"Cуммы чётных строк не образуют возрастающую последовательность")
+
+
+def input_matrix(name):
+    # Ввод двумерного массива с клавиатуры.
+    while True:
+        try:
+            n = int(input(f"Введите количество строк массива {name} (1-10): "))
+            m = int(input(f"Введите количество столбцов массива {name} (1-10): "))
+            if 1 <= n <= 10 and 1 <= m <= 10:
+                break
+            print("Размер должен быть от 1 до 10. Повторите ввод.")
+        except ValueError:
+            print("Ошибка: введите целое число.")
+
+    matrix = []
+    print(f"Введите элементы массива {name} построчно ({n} строк по {m} чисел):")
+    for i in range(n):
+        while True:
+            try:
+                row = list(map(int, input(f"  Строка {i + 1}: ").split()))
+                if len(row) == m:
+                    matrix.append(row)
+                    break
+                print(f"  Нужно ввести ровно {m} чисел.")
+            except ValueError:
+                print("  Ошибка: введите целые числа через пробел.")
+    return matrix
+
 
 def main():
-    #Точка входа: ввод двух матриц и вывод результата
-    matrices = {name: read_matrix(name) for name in ('A', 'B')}
+    print("Проверка возрастания сумм чётных строк")
+    print ('-' * 47)
+ 
+    A = input_matrix("A")
+    B = input_matrix("B")
 
-    for name, mat in matrices.items():
-        ok, sums = check(mat)
-        status = 'ВЫПОЛНЕНО' if ok else 'НЕ выполнено'
-        print(f'Массив {name}: суммы чётных строк = {sums} -> {status}')
+    check_array(A, "A")
+    check_array(B, "B")
 
-if __name__ == 'main':
+
+if __name__ == "__main__":
     main()
