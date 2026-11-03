@@ -1,0 +1,97 @@
+mport re
+import math
+
+# Чтение исходного кода
+with open("rewue.py", "r", encoding="utf-8") as f:
+    source = f.read()
+
+# Токенизация
+# Убираем комментарии и строковые литералы 
+code = re.sub(r"#.*", "", source)                      # комментарии
+code = re.sub(r'""".*?"""', "", code, flags=re.S)      # docstring
+code = re.sub(r'"[^"\n]*"', " STR ", code)             # строки
+code = re.sub(r"'[^'\n]*'", " STR ", code)             # строки
+
+# Операторы (ключевые слова, знаки, разделители)
+OPERATORS = [
+    "def", "return", "if", "else", "elif", "for", "in", "while",
+    "try", "except", "break", "continue", "pass", "import", "from",
+    "and", "or", "not", "is", "None", "True", "False",
+    "==", "!=", "<=", ">=", "+=", "-=", "*=", "/=", "//", "**",
+    "<", ">", "=", "+", "-", "*", "/", "%",
+    "(", ")", "[", "]", "{", "}", ",", ":", ".", ";",
+]
+
+# Идентификаторы и числовые константы
+token_re = re.compile(
+    r"\b\d+\.?\d*\b"                # числа
+    r"|\b[A-Za-z_]\w*\b"            # идентификаторы
+)
+
+# Подсчет
+def split_tokens(text):
+    """Разбивает текст на операторы и операнды."""
+    ops, oprs = [], []
+    # Сначала вытаскиваем операнды и заменяем их плейсхолдером
+    operands_found = token_re.findall(text)
+    # Убираем ключевые слова из операндов
+    keywords = set(k for k in OPERATORS if k.isalpha())
+    operands = [t for t in operands_found if t not in keywords]
+    oprs.extend(operands)
+
+    # ищем все вхождения операторов
+    for op in OPERATORS:
+        # для символьных операторов — просто count
+        if not op.isalpha():
+            cnt = text.count(op)
+        else:
+            cnt = len(re.findall(rf"\b{op}\b", text))
+        if cnt:
+            ops.extend([op] * cnt)
+    return ops, oprs
+
+ops, oprs = split_tokens(code)
+
+# базовые метрики
+n1 = len(set(ops))          # число различных операторов
+n2 = len(set(oprs))         # число различных операндов
+N1 = len(ops)               # общее число операторов
+N2 = len(oprs)              # общее число операндов
+
+n = n1 + n2                 # словарь
+N = N1 + N2                 # длина
+
+# производные метрики
+V  = N * math.log2(n) if n > 1 else 0            # объём
+L  = (n1 / n2) if n2 else 0                       # уровень программы
+D  = (n1 / 2) * (N2 / n2) if n2 else 0            # сложность
+E  = V * D                                        # усилия
+T  = E / 18                                       # время (S=18)
+B  = V / 3000                                     # ошибки
+L_est = (2 * n2) / (n1 * N2) if n1 and N2 else 0  # оценка уровня
+N_est = n1 * math.log2(n1) + n2 * math.log2(n2) if n1 and n2 else 0
+V_star = (2 + n2) * math.log2(2 + n2) if n2 else 0
+I = V / D if D else 0
+lam = L * V_star if V_star else 0
+T_est = E / 18 if E else 0
+
+# Вывод
+print(f"The number of different operators : {n1}")
+print(f"The number of different operands  : {n2}")
+print(f"The total number of operators     : {N1}")
+print(f"The total number of operands      : {N2}")
+print()
+print(f"Dictionary ( D )                  : {n}")
+print(f"Length ( N )                      : {N}")
+print(f"Length estimation (N^)            : {N_est:.4f}")
+print(f"Volume ( V )                      : {V:.4f}")
+print(f"Potential volume (V*)             : {V_star:.4f}")
+print(f"Limit volume (V)                  : {V_star:.4f}")
+print(f"Programming level ( L )           : {L:.4f}")
+print(f"Programming level estimation ( L*): {L_est:.4f}")
+print(f"Intellect ( I )                   : {I:.4f}")
+print(f"Time of programming ( T )         : {T:.4f}")
+print(f"Time estimation ( T^ )            : {T_est:.4f}")
+print(f"Programming language level (λ)    : {lam:.4f}")
+print(f"Work on programming ( E )         : {E:.4f}")
+print(f"Error ( B )                       : {B:.6f}")
